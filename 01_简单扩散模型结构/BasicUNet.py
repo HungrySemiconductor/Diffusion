@@ -40,8 +40,10 @@ class BasicUNet(nn.Module):
 
         return x
     
-# 测试BasicUNet
-net = BasicUNet()
-x = torch.rand(8, 1, 28, 28)  # 输入形状为(批量大小, 通道数, 高度, 宽度)
-print(net(x).shape)           # 输出应与输入形状相同
-print(sum([p.numel() for p in net.parameters()]))  # 输出模型参数总数
+
+if __name__ == '__main__':
+    # 测试BasicUNet
+    net = BasicUNet()
+    x = torch.rand(8, 1, 28, 28)  # 输入形状为(批量大小, 通道数, 高度, 宽度)
+    print(net(x).shape)           # 输出应与输入形状相同
+    print(sum([p.numel() for p in net.parameters()]))  # 输出模型参数总数
