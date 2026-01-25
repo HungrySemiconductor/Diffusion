@@ -19,10 +19,10 @@ x, y = next(iter(train_loader))
 print('Input shape:', x.shape)
 print('Labels:', y)
 
-# 可视化样本，检查数据加载器中样本的形状与标签是否正确
-plt.imshow(torchvision.utils.make_grid(x)[0], cmap='Grays')
-plt.title('Original MNIST Images')
-plt.show()
+# # 可视化样本，检查数据加载器中样本的形状与标签是否正确
+# plt.imshow(torchvision.utils.make_grid(x)[0], cmap='Grays')
+# plt.title('Original MNIST Images')
+# plt.show()
 
 """根据amount为输入x加入噪声，即退化过程"""
 def corrupt(x, amount):
@@ -34,15 +34,15 @@ def corrupt(x, amount):
 amount = torch.linspace(0, 1, x.shape[0])    # 从0到1增加噪声，退化得更强烈
 noisy_x = corrupt(x, amount)
 
-# 绘制输入数据和加入噪声后的样本
-fig, axs = plt.subplots(2, 1, figsize=(12, 8))
+# # 绘制输入数据和加入噪声后的样本
+# fig, axs = plt.subplots(2, 1, figsize=(12, 8))
 
-# 原始数据
-axs[0].set_title('Input data')
-axs[0].imshow(torchvision.utils.make_grid(x)[0], cmap='Greys')
+# # 原始数据
+# axs[0].set_title('Input data')
+# axs[0].imshow(torchvision.utils.make_grid(x)[0], cmap='Greys')
 
-# 加入噪声后的数据
-axs[1].set_title('Corrupted data (-- amount increases -->)')
-axs[1].imshow(torchvision.utils.make_grid(noisy_x)[0], cmap='Greys')
+# # 加入噪声后的数据
+# axs[1].set_title('Corrupted data (-- amount increases -->)')
+# axs[1].imshow(torchvision.utils.make_grid(noisy_x)[0], cmap='Greys')
 
-plt.show()
+# plt.show()

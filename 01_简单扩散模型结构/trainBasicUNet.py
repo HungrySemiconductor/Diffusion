@@ -5,8 +5,8 @@ from torch import nn
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-
 from BasicUNet import BasicUNet
+
 from addNoise import corrupt
 
 
@@ -19,7 +19,7 @@ print(f'Using device: {device}')
 # 下载数据集
 dataset = torchvision.datasets.MNIST(root="mnist/", train=True, download=True, transform=torchvision.transforms.ToTensor())
 # 数据加载器
-batch_size = 8
+batch_size = 128
 train_dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 x, y = next(iter(train_dataloader))
 
@@ -41,7 +41,7 @@ losses = []
 
 # 训练
 for epoch in range(n_epochs):
-    for c, y in train_dataloader:
+    for x, y in train_dataloader:
 
         # 获取数据并退化处理
         x = x.to(device)    # 将数据加载到GPU
@@ -83,16 +83,39 @@ noised_x = corrupt(x, amount)
 with torch.no_grad():
     pred = net(noised_x.to(device)).detach().cpu()
 
-# 绘图
-# 绘制输入数据和加入噪声后的样本
-fig, axs = plt.subplots(3, 1, figsize=(12, 8))
-# 原始数据
-axs[0].set_title('Input data')
-axs[0].imshow(torchvision.utils.make_grid(x)[0].clip(0,1), cmap='Greys')
-# 加入噪声后的数据
-axs[1].set_title('Corrupted data (-- amount increases -->)')
-axs[1].imshow(torchvision.utils.make_grid(noised_x)[0].clip(0,1), cmap='Greys')
-# 预测输出
-axs[2].set_title('Network Predictions')
-axs[2].imshow(torchvision.utils.make_grid(pred)[0].clip(0,1), cmap='Greys')
+
+# # 绘图
+# # 绘制输入数据和加入噪声后的样本
+# fig, axs = plt.subplots(3, 1, figsize=(12, 8))
+# # 原始数据
+# axs[0].set_title('Input data')
+# axs[0].imshow(torchvision.utils.make_grid(x)[0].clip(0,1), cmap='Greys')
+# # 加入噪声后的数据
+# axs[1].set_title('Corrupted data (-- amount increases -->)')
+# axs[1].imshow(torchvision.utils.make_grid(noised_x)[0].clip(0,1), cmap='Greys')
+# # 预测输出
+# axs[2].set_title('Network Predictions')
+# axs[2].imshow(torchvision.utils.make_grid(pred)[0].clip(0,1), cmap='Greys')
+# plt.show()
+
+# 采样处理
+n_steps = 5
+x = torch.rand(8, 1, 28, 28).to(device)
+step_history = [x.detach().cpu()]
+pred_output_history = []
+
+for i in range(n_steps):
+    with torch.no_grad():
+        pred = net(x)
+    pred_output_history.append(pred.detach().cpu())
+    mix_factor = 1/(n_steps-i)
+    x = x*(1-mix_factor) + pred*mix_factor
+    step_history.append(x.detach().cpu())
+
+fig, axs = plt.subplots(n_steps, 2, figsize=(9, 4), sharex=True)
+axs[0, 0].set_title('x (model input)')
+axs[0, 1].set_title('model prediction')
+for i in range(n_steps):
+    axs[i, 0].imshow(torchvision.utils.make_grid(step_history[i])[0].clip(0,1), cmap='Greys')
+    axs[i, 1].imshow(torchvision.utils.make_grid(pred_output_history[i])[0].clip(0,1), cmap='Greys')
 plt.show()
