@@ -16,11 +16,11 @@
   - 将数据输入模型
   - 对模型预测与初始图像进行比较，计算损失更新模型的参数
 
-  <img src="E:\Typora\Typora\coding-study\Figure_1-1769348077706.png" alt="img" style="zoom: 33%;" />
+  <img src=".\imgs\Figure_1-1769348077706.png" alt="img" style="zoom: 33%;" />
 
 - **采样理论**：从完全噪声开始，每次都检查一下预测结果，如果新的预测结果比上一次的好，就将其输入模型以获得新的预测结果
 
-  <img src="E:\Typora\Typora\coding-study\Figure_2.png" alt="img" style="zoom: 80%;" />
+  <img src=".\imgs\Figure_2.png" alt="img" style="zoom: 80%;" />
 
 - **复杂的UNet2DModel模型**：Diffusers库中的DDPM版本
 
@@ -53,7 +53,7 @@
 
 [1] 扩散模型从原理到实战, 李忻玮, 苏步升, 徐浩然, 余海铭, 人民邮电出版社
 
-<img src="E:\Typora\Typora\coding-study\image-20260124184542838.png" alt="image-20260124184542838" style="zoom:33%;" />
+<img src=".\imgs\image-20260124184542838.png" alt="image-20260124184542838" style="zoom:33%;" />
 
 
 
