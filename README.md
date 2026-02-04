@@ -37,21 +37,49 @@
 
 ## 2. 训练自定义扩散模型
 
-- 通过huggingface快速调用别人训练好的模型
+- **通过huggingface快速调用别人训练好的模型**
+  
   - 创建管线，使用 `Pipeline.from_pretrained("model_name")` 加载预训练模型
   - 直接调用管线生成图像 
-- Diffusers核心API
+  
+- **Diffusers核心API**
+  
   - 管线：能快速地利用训练好的主流扩散模型来生成样本
+  
   - 模型：训练新的模型是需要用到的网络结构（如Unet模型）
+  
   - 调度器：控制在不同迭代周期中添加的噪声量，并用模型的预测结果逐步消除这些噪声
-- 扩散模型训练流程
-  1. 从训练集中加载图像
+  
+    - ```python
+      from diffusers import DDPMScheduler
+      noise_scheduler = DDPMScheduler(num_train_timesteps=1000)
+      
+      # 通过修改下面的参数来对调度器的超参数beta进行控制
+      
+      # beta_start：推理阶段开始时 beta 的值
+      # beta_end：控制 beta 的最终值
+      # 示例1： noise_scheduler = DDPMScheduler(num_train_timesteps=1000, beta_start=0.001, beta_end=0.004)
+      
+      # beta_schedule：通过函数映射来为模型推理的每一步生成一个 beta 值（下面示例为cosine函数的调度方式）
+      # 示例2： noise_scheduler = DDPMScheduler(num_train_timesteps=1000, beta_schedule='squaredcos_cap_v2')
+      ```
+  
+- **定义扩散模型**：大多数扩散模型的结构使用的是UNet模型的变体，UNet模型的一个关键特征是输入与输出图片尺寸相同，正好用于扩散模型
+
+  - 下采样：将图片尺寸减半
+  - 中间模块
+  - 上采样：将图片恢复到原始尺寸
+  - 残差链连接模块会将特征图分辨率相同的上采样层和下采样层连接起来
+
+- **扩散模型训练流程（迭代优化循环过程：逐批batch输入数据、更新参数）**
+
+  1. 从训练集中加载图像（随机采样几个迭代周期）
   2. 添加不同级别的噪声
   3. 将加噪后的图像输入模型
-  4. 评估模型对输入的去噪效果
-  5. 用得到的性能信息更新模型权重，然后重复上述步骤
+  4. 评估模型对输入的去噪效果（将MSE作为损失函数，比较目标结果与模型的预测结果，**即真实噪声和模型预测的噪声之间的差距**）
+  5. 用得到的性能信息更新模型权重，然后重复上述步骤（**通过调用函数 loss.backward() 和 optimizer.step() 来更新模型参数**）
 
-
+  
 
 
 
